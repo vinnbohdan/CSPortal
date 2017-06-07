@@ -42,9 +42,13 @@ respond = function (task_id) {
         var br = document.createElement('br');
         sect.appendChild(br);
         var workArea = document.getElementById('workArea');
+
+
         //var f = document.createElement("form");
         //f.setAttribute('method', "post");
         //f.setAttribute('action', "/api/Requests/SubmitResponse");
+
+
         tbl = document.createElement('table');
         tbl.setAttribute('border', '1');
         tbdy = document.createElement('tbody');
@@ -68,12 +72,15 @@ respond = function (task_id) {
         s.setAttribute('type', "button");
         s.setAttribute('value', "Submit");
         s.setAttribute('id', task_id);
-        s.setAttribute('onClick', "submit(this.id);");//"return(submit(this.id));");
+        s.setAttribute('onClick', "return(submit(this.id));");
         td.appendChild(s);
         tr.appendChild(td);
         tbdy.appendChild(tr);
         tbl.appendChild(tbdy);
         workArea.appendChild(tbl);
+
+
+
         //f.appendChild(tbl);
         //workArea.appendChild(f);
     });
@@ -90,25 +97,26 @@ submit = function (task_id) {
     if (token) {
         headers.Authorization = 'Bearer ' + token;
     }
-    //var val = {
-    //    text: document.getElementById('responseInput').value,
-    //    author: '0cd0f199-f711-400f-b71d-8507cd788260',
-    //    task: task_id
-    //    //author: {
-    //    //    id: '0cd0f199-f711-400f-b71d-8507cd788260'
-    //    //},
-    //    //task: {
-    //    //    id: task_id
-    //    //}
-    //}
+    var val = {
+        'Text': document.getElementById('responseInput').value,     
+        'TaskID': task_id
+        //author: {
+        //    id: '0cd0f199-f711-400f-b71d-8507cd788260'
+        //},
+        //task: {
+        //    id: task_id
+        //}
+    }
     $.ajax({
         type: 'POST',
         url: '/api/Requests/SubmitResponse',
         headers: headers,
-        data: "=" + task_id
-        //data: JSON.stringify(val)
+        //data: "=" + task_id
+        data: val//JSON.stringify(val)
     }).done(function (data) {
         alert('OK');
+        window.location.href = "http://localhost:29370/Home/Customer";
+
     });
 }
 getTasks = function () {

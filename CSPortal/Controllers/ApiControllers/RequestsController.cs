@@ -48,24 +48,22 @@ namespace CSPortal.Controllers.ApiControllers
         }
         [Authorize]
         [Route("SubmitResponse")]
-        public IHttpActionResult PostSubmitResponse([FromBody] Guid task_id)
+        public IHttpActionResult PostSubmitResponse(Comment comPass)//[FromBody] Guid task_id)
         {
-            ClaimsPrincipal principal = Request.GetRequestContext().Principal as ClaimsPrincipal;
-            string userN = ClaimsPrincipal.Current.Identity.GetUserName();
-            //UserManager<Author> UserManager = new UserManager<Author>(new UserStore<Author>(db));
-            //var p = db.Users.FirstOrDefault(us => us.UserName == userN);
+            //ClaimsPrincipal principal = Request.GetRequestContext().Principal as ClaimsPrincipal;
+            //string userN = ClaimsPrincipal.Current.Identity.GetUserName();
             var manager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(new dbContext()));
-            var currentUser = manager.FindById(User.Identity.GetUserId());
+            var currentUser = User.Identity.GetUserId();
             try
             {
-                var task = db.Task.FirstOrDefault(x => x.Id == task_id);
+                //var task = db.Task.FirstOrDefault(x => x.Id == task_id);
                 Comment com = new Comment()
                 {
                     Id = Guid.NewGuid(),
                     DateComment = DateTime.Now,
-                    Text = "hELLO",
-                    Author = (Author)currentUser,
-                    Task = task
+                    Text = comPass.Text,
+                    AuthorID = currentUser,
+                    TaskID = comPass.TaskID
                 };
                 db.Comment.Add(com);
                 db.SaveChanges();
