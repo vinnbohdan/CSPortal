@@ -30,8 +30,8 @@ namespace CSPortal.Controllers.ApiControllers
             return Ok(data);
         }
         [Authorize]
-        [Route("WriteRespond")]
-        public IHttpActionResult PostWriteRespond([FromBody] Guid task_id)
+        [Route("WriteResponse")]
+        public IHttpActionResult PostWriteResponse([FromBody] Guid task_id)
         {
             var data = db.Comment.Join(db.Users,
                      p => p.Author.Id,
@@ -87,7 +87,62 @@ namespace CSPortal.Controllers.ApiControllers
                 throw raise;
             }
         }
-
+        [Authorize]
+        [Route("WriteRequest")]
+        public IHttpActionResult PostWriteRequest()
+        {
+            //var data = db.Comment.Join(db.Users,
+            //         p => p.Author.Id,
+            //         c => c.Id,
+            //         (p, c) => new
+            //         {
+            //             p.Text,
+            //             c.UserName,
+            //             p.Task.Id
+            //         })
+            //         .Where(x => x.Id == task_id)
+            //         .Select(x => new { x.UserName, x.Text });
+            return Ok();
+        }
+        [Authorize]
+        [Route("SubmitRequest")]
+        public IHttpActionResult PostAddNewRequest(Task taskPass)
+        {
+            var manager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(new dbContext()));
+            var currentUser = User.Identity.GetUserId();
+            try
+            {
+                Task newTask = new Task()
+                {
+                    Id = Guid.NewGuid(),
+                    DateTask = DateTime.Now,
+                    Title = taskPass.Title,
+                    Status = "Created",
+                    OperatorID = currentUser,
+                    CustomerID = currentUser
+                };
+                db.Task.Add(newTask);
+                db.SaveChanges();
+                return Ok();
+            }
+            catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+            {
+                Exception raise = dbEx;
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                    {
+                        string message = string.Format("{0}:{1}",
+                            validationErrors.Entry.Entity.ToString(),
+                            validationError.ErrorMessage);
+                        // raise a new exception nesting
+                        // the current instance as InnerException
+                        raise = new InvalidOperationException(message, raise);
+                    }
+                }
+                throw raise;
+            }
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
